@@ -51,6 +51,12 @@ def signup():
 def add_tweet():
     return render_template("add_tweet.html")
 
+@app.route('/signout')
+def signout():
+    login_session['user'] = None
+    auth.current_user = None
+    return render_template("signin.html")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
