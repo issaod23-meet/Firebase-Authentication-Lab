@@ -72,6 +72,12 @@ def signout():
     auth.current_user = None
     return render_template("signin.html")
 
+@app.route('/all_tweets')
+def alltweets():
+    x = db.child('tweets').get().val()
+    return render_template("tweets.html")
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
