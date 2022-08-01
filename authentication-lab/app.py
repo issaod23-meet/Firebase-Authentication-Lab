@@ -13,13 +13,13 @@ config = {
   "storageBucket": "fir-lab-a90ac.appspot.com",
   "messagingSenderId": "812510174445",
   "appId": "1:812510174445:web:88c69b0d7739ce5bb2c0e4",
-  "measurementId": "G-FXS9YMVBBG","databaseURL":""
+  "measurementId": "G-FXS9YMVBBG","databaseURL":"https://fir-lab-a90ac-default-rtdb.europe-west1.firebasedatabase.app/",
 }
 
 
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
-
+db = firebase.database()
 
 @app.route('/', methods=['GET', 'POST'])
 def signin():
@@ -29,9 +29,11 @@ def signin():
        password = request.form['password']
     try:
         login_session['user'] = auth.sign_in_with_email_and_password(email, password)
+        print(login_session)
         return render_template("add_tweet.html")
     except:
            error = "Authentication failed"
+           print('GEUWCDJSHK')
            return render_template("signin.html")
 
 
@@ -40,8 +42,14 @@ def signup():
     if request.method == 'POST':
        email = request.form['email']
        password = request.form['password']
+       username= request.form['username']
+       bio = request.form['bio']
+       name = request.form['fullname']
+       user = {'name': name, 'bio':bio, 'username': username}
     try:
         login_session['user'] = auth.create_user_with_email_and_password(email, password)
+        db.child('Users').child(login_session['user']['localId']).set(user)
+
         return render_template("add_tweet.html")
     except:
         return render_template("signup.html")
@@ -49,7 +57,14 @@ def signup():
 
 @app.route('/add_tweet', methods=['GET', 'POST'])
 def add_tweet():
+    print(login_session)
+    title = request.form['title']
+    tweets= request.form['tweet']
+    tweet = {'title': title,'tweet': tweets,"uid":login_session['user']['localId']}
+    db.child('tweets').push(tweet)
     return render_template("add_tweet.html")
+    db.child('Users').child(login_session['user']['localId']).set(user)
+
 
 @app.route('/signout')
 def signout():
